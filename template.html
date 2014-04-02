@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HTML5 Web Audio Template</title>
+    <meta charset="UTF-8"\>
+  </head>
+  <body>
+    <style>
+    button {
+        height: 5em;
+    }
+    </style>
+    <div id="palette"></div>
+    <script>
+/*
+
+Copyright 2014 Abram Hindle
+
+From http://www.html5rocks.com/en/tutorials/webaudio/intro/
+Copyright 2013 Boris Smus
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+var sounds = [
+    "./sounds/alien.ogg",
+    "./sounds/confetti.ogg",
+    "./sounds/edges.ogg",
+    "./sounds/emboss.ogg",
+    "./sounds/fisheye.ogg",
+    "./sounds/flower_click.ogg",
+    "./sounds/flower_release.ogg",
+    "./sounds/foam.ogg",
+    "./sounds/fold.ogg",
+    "./sounds/glasstile.ogg",
+    "./sounds/kaleidoscope.ogg",
+    "./sounds/light1.ogg",
+    "./sounds/light2.ogg",
+    "./sounds/rain.ogg",
+    "./sounds/realrainbow.ogg",
+    "./sounds/ripples.ogg",
+    "./sounds/sharpen.ogg",
+    "./sounds/shift.ogg",
+    "./sounds/silhouette.ogg",
+    "./sounds/snowball.ogg",
+    "./sounds/snowflake.ogg",
+    "./sounds/toothpaste.ogg",
+    "./sounds/tv.ogg",
+    "./sounds/wavelet.ogg",
+    "./sounds/waves.ogg"
+];
+var buffers = {};
+
+var context;
+
+var ready;
+
+
+function loadSound(url,setter) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+
+    // Decode asynchronously
+    request.onload = function() {
+        context.decodeAudioData(request.response, function(buffer) {
+            setter(url,buffer);
+        }, function(e) { console.log(e); });
+    };
+    request.send();
+}
+
+function loadSounds(sounds,buffers,done) {
+    var notDone = sounds.length;
+    for (var i in sounds) {
+        loadSound(sounds[i], function(url,buffer) {
+            buffers[url] = buffer;
+            notDone--;
+            if (notDone <= 0) {
+                done();
+            }
+        });
+    }
+    return buffers;
+}
+
+function audioInit() {
+    try {
+        // Fix up for prefixing
+        window.AudioContext = window.AudioContext||window.webkitAudioContext;
+        context = new AudioContext();
+    }
+    catch(e) {
+        alert('Web Audio API is not supported in this browser' + e);
+    }
+
+    try {
+        loadSounds( sounds, buffers, ready );
+    } catch(e) {
+        alert(e);
+    }
+}
+
+function playBuffer(buffer, destination, when) {
+    if (destination  === undefined) {
+        destination = context.destination;
+    }
+    if (when === undefined) {
+        when = 0;
+    }
+    var source = context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(context.destination);            
+    source.start(context.currentTime + when);
+}
+
+
+function exampleInstrument() {
+    var now = 0.01;
+    for (var i = 0 ; i < 16; i++) {
+        now *= 1.5;
+        playBuffer(buffers["./sounds/toothpaste.ogg"], context.destination, now);
+    }
+}
+
+
+function ready() {
+    // now the buffers are loaded!
+    var sources = [];
+    var palette = document.getElementById("palette");
+    function mkListener(i) {
+        return function() {
+            playBuffer(buffers[sounds[i]]);
+        };
+    }
+    for (var i = 0 ; i < sounds.length; i++) {
+        var button = document.createElement("button");
+        button.appendChild( new Text(sounds[i]) );        
+        palette.appendChild(button);
+        button.addEventListener('mouseover', mkListener(i) );
+        button.addEventListener('click', mkListener(i) );
+    }
+
+    var button = document.createElement("button");
+    button.appendChild( new Text("example") );
+    palette.appendChild( button );
+    button.addEventListener('click', exampleInstrument);
+
+    
+}
+
+
+
+
+window.addEventListener('load', audioInit, false);
+    </script>
+  </body>
+</html>
