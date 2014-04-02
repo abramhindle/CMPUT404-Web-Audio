@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8"/>
+
+		<title>Web Audio</title>
+
+		<meta name="description" content="Web Video"/>
+		<meta name="author" content="Abram Hindle"/>
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+<style>
+/* long slides need scrolling! */
+.reveal {
+    overflow-y: auto;
+}
+</style>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+			  <section>
+			    <h1>Web Audio</h1>
+			    <p>
+			      <small>Created
+				by <a href="http://softwareprocess.es">Abram
+				  Hindle</a><br/>
+                                abram dot hindle at ualberta dot ca
+				<br/>
+                                Department of Computing Science<br/>
+                                University of Alberta<br/>
+                                Edmonton, Alberta, Canada<br/>
+                                Earth<br/>
+
+			    </p>
+                            <p>
+                              </small>
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+
+			    </p>
+			  </section>
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## Web Audio
+
+* Multimedia has always been important on the web.
+* Audio is very popular on the web.
+* Sites like soundcloud.com and archive.org provide web audio
+* Web audio is often streamed like "radio stations".
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## Web Audio
+
+* Currently lots of web audio is still served by plugins such as:
+   * flash
+* These plugins are typically missing on mobile platforms
+* Flash is being poorly maintained and flash on Linux 
+* Flash has been a security issue for browsers for some time:
+   * http://helpx.adobe.com/security/products/flash-player.html
+   * http://helpx.adobe.com/security.html#shockwave
+* Is flash dead? https://www.google.ca/#q=is+flash+dead+2014
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## Web Audio
+
+* So I won't be covering flash or any plugins.
+* HTML5 ushered in the &lt;audio&gt; tag. 
+  * We're going to use that.
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## HTML5 Web Audio
+
+* &lt;audio&gt; tag was welcomed by many
+* allow any device to play videos if they can support it
+* No proprietary nonsense*
+* http://caniuse.com/audio
+* http://www.jplayer.org/latest/demos/ (nice looking player for the web)
+</script>
+</div>
+<img src="images/video.png"/>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;audio&gt;
+
+* The audio tag can play encoded audio files streamed over HTTP. 
+* If the container allows streaming it will be streamed in the browser.
+* Some browsers support RTP and RTSP -- it doesn't work for most. 
+  * Besides HTTP is guaranteed to work!
+  * RTP is often over UDP -- not guaranteed!
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;audio&gt;
+
+* The audio tag can play encoded audio files streamed over HTTP. 
+  * The audio tag allows multiple sources
+  * The audio tag allows multiple formats
+  * In fact there's not 1 format that will play on all browsers
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;audio&gt;
+
+Use the &lt;audio&gt; tag, and specify 2 formats one could use and ask
+the audio tag for controls.
+
+* autoplay - automatically play the audio (annoying)
+* controls - show UI controls for the audio
+* loop - loop it
+* muted - mute it by default
+* preload - should the audio be preloaded (ready for play)
+* src - url (use source tags instead!)
+
+````
+    <audio id="basicaudio" controls>
+      <source src="music/KIMIKO_ISHIZAKA_-_Goldberg_Variations_BWV_988_-_05_-_Variatio_4_a_1_Clav.__44k-24b.mp3"
+      type="audio/mpeg" />
+      <source src="music/KIMIKO_ISHIZAKA_-_Goldberg_Variations_BWV_988_-_05_-_Variatio_4_a_1_Clav.__44k-24b.ogg" type="audio/ogg" />
+    </audio>
+````
+
+</script>
+</div>
+<div>
+    <audio id="basicaudio" controls>
+      <source src="music/KIMIKO_ISHIZAKA_-_Goldberg_Variations_BWV_988_-_05_-_Variatio_4_a_1_Clav.__44k-24b.mp3"
+      type="audio/mpeg" />
+      <source src="music/KIMIKO_ISHIZAKA_-_Goldberg_Variations_BWV_988_-_05_-_Variatio_4_a_1_Clav.__44k-24b.ogg" type="audio/ogg" />
+    </audio>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;audio&gt;
+
+* Notice the source tags within the video tag?
+  * 3 file types
+    * Ogg Vorbis (Theora)
+    * Mpeg1 Layer 3
+* We need to provide different formats for different devices and
+  different license holders
+
+````
+    <video id="basicmovie" width="640" height="480" preload muted loop autoplay>
+      <source src="DSCI0037.webm" type="video/webm; codecs=vp8,vorbis" />
+      <source src="DSCI0037.ogv" type="video/ogg; codecs=theora,vorbis" />
+      <source src="DSCI0037.mp4" />
+    </video>
+````
+
+</script>
+</div>
+<div>
+    <video id="basicmovie" width="640" height="480" preload muted loop autoplay>
+      <source src="DSCI0037.webm" type="video/webm; codecs=vp8,vorbis" />
+      <source src="DSCI0037.ogv" type="video/ogg; codecs=theora,vorbis" />
+      <source src="DSCI0037.mp4" />
+    </video>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt;
+
+* Notice the source tags within the video tag?
+  * I dropped webm, now we're stuck with ogv and mp4.
+  * WebM and Mp4 cover the most browsers
+
+````
+    <video id="basicmovie" width="640" height="480" preload muted loop autoplay>
+      <source src="DSCI0037.ogv" type="video/ogg; codecs=theora,vorbis" />
+      <source src="DSCI0037.mp4" />
+    </video>
+````
+
+</script>
+</div>
+<div>
+    <video id="basicmovie" width="640" height="480" preload muted loop autoplay>
+      <source src="DSCI0037.ogv" type="video/ogg; codecs=theora,vorbis" />
+      <source src="DSCI0037.mp4" />
+    </video>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt;
+
+* Different Codecs
+  * WebM - VP8 codec/royalty free. Google is behind it.
+     * Runs in Chrome
+     * Runs in Firefox
+     * Plugins run it in IE
+     * Google paid MPEG/LA for any missing rights to ensure that VP8
+       and VP9 are free for everyone.
+  * OggVorbis Theora - royalty/patent free. Ogg is behind it.
+     * Runs in Chrome
+     * Runs in Firefox
+  * MP4 and H264 - Patent encumbered in USA and somewhat in Canada
+     * Runs in Chrome
+     * Runs in Safari
+     * Runs in IE
+     * Runs on Android (baseline)
+     * Runs on iOS (baseline)
+     * Decoded and Encoded often in hardware
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt;
+
+* What do Different Codecs mean?
+  * You have to encode each video file at least twice:
+     * WebM
+     * mp4
+* Theora isn't that popular.
+* Best quality regardless of size: H264
+* Best quality with low size? Not clear
+* Best quality for medium size? H264 or WebM
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; with Audio
+
+* We want the video to have sound right?
+* Different AUDIO Codecs
+  * Ogg - ogg vorbis (better quality than MP3s) patent free
+  * mp3 - MPEG1 Layer 3 - Patent Encumbered - sort of low quality
+  * AAC - Patent Encumbered format popular with Apple and H264
+  * FLAC - Rare, lossless, patent free
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; and containers
+
+* MKV - Matroska
+  * supports WebM and Theora and H264 and various audio formats
+  * unpopular on proprietary platforms
+  * Very piratey
+* OGV / OGG / OGM - Ogg
+  * Supports Theora and Ogg AUdio
+  * Used solely for Ogg stuff
+* MP4/M4V/MOV
+  * Container made primarily for mpeg4 or older mpegs.
+* AVI - Audio Video Interleave
+  * Hacked together format, avoid.
+* WebM container
+  * Supports VP8 and Theora
+  * meant for streaming
+  * VP9 and Opus audio are also supported
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; files
+
+* Recommendations:
+  * .webm -- WebM with VP8 video and Vorbis Audio
+  * .ogv -- Ogg container with Ogg Theora video with Ogg Vorbis audio
+  * .mp4 -- MPEG4 container with H264 encoded video and AAC encoded
+  audio (heavily patented)
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## How do we make ogv?
+
+* ffmpeg2theora
+
+See Makefile
+
+````
+.webm.ogg: %.webm
+	ffmpeg2theora -a 3 -v 4 -o $@ $<
+````
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## How do we make mp4?
+
+* ffmpeg and x264
+
+See Makefile
+
+````
+.webm.mp4: %.webm
+	ffmpeg -i $< -b 1500k -vcodec libx264 -vprofile slow \
+                    -vprofile baseline -g 30 -s 640x480 $@
+````
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## How do we make webm?
+
+* ffmpeg
+* miro http://www.getmiro.com/download/for-ubuntu/
+
+For 720p
+
+````
+ffmpeg -threads 4 -i $INPUT -vpre libvpx-720p -b 3900k \
+                -pass 1 -an -f webm -y $FILE.webm
+ffmpeg -threads 4 -i $INPUT -vpre libvpx-720p -b 3900k \
+                 -pass 2 -acodec libvorbis -ab 100k \
+                 -ar 44100 -f webm -y $FILE
+````
+
+ffmpeg can be really annoying to use. Build it from source for best results.
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## WATCH OUT!
+
+* Be sure to return proper mime-types for each video type in the HTTP headers!
+
+* Also ensure that you use the type attributes for source videos so
+that browsers can choose the appropriate one!
+
+````
+      <source src="DSCI0034.webm" type="video/webm; codecs=vp8,vorbis" />
+      <source src="DSCI0034.ogv" type="video/ogg; codecs=theora,vorbis" />
+````
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown style="background: rgba(255,255,255,0.5);">
+<script type="text/template">
+## &lt;video&gt;
+
+* The video tag is an HTML element. We can treat it as such
+
+````
+    <video id="basicmovie" width="100%" height="100%" preload muted loop
+           autoplay
+           style="position: absolute; top: 0; left: 0; z-index:-10;"
+           >
+      <source src="DSCI0034.webm" type="video/webm; codecs=vp8,vorbis" />
+      <source src="DSCI0034.ogv" type="video/ogg; codecs=theora,vorbis" />
+      <source src="DSCI0034.mp4" />
+    </video>
+
+````
+
+</script>
+</div>
+<div>
+    <video id="basicmovie" width="100%" height="100%" preload muted loop
+           autoplay
+           style="position: absolute; top: 0; left: 0; z-index:-10;"
+           >
+      <source src="DSCI0034.webm" type="video/webm; codecs=vp8,vorbis" />
+      <source src="DSCI0034.ogv" type="video/ogg; codecs=theora,vorbis" />
+      <source src="DSCI0034.mp4" />
+    </video>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; example
+
+<a href="example.html">EXAMPLE</a>
+````
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Example</title>
+    <meta charset="UTF-8"/>
+  </head>
+  <body>
+    <video id="basicmovie" width="640" height="480" preload controls>
+      <source src="DSCI0031.webm" type="video/webm; codecs=vp8,vorbis" />
+      <source src="DSCI0031.ogv" type="video/ogg; codecs=theora,vorbis" />
+      <source src="DSCI0031.mp4" />
+    </video>
+  </body>
+</html>
+````
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; example 2
+
+We can jam that video into the background!
+
+<a href="example2.html">EXAMPLE 2</a>
+
+````
+    #basicmovie {
+        z-index: -10;
+        position: fixed;
+    }
+
+````
+
+
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; example 3
+
+The video tag is an HTML Element! We can treat it accordingly and
+interact with it with Javascript!
+
+We can automatically decay the volume of the videos and
+programmitcally increase it.
+
+<a href="example3.html">EXAMPLE 3</a>
+
+````
+      window.onload = function() {
+          try {
+              var videos = document.getElementsByTagName("video");
+              var buttons = document.getElementsByTagName("button");
+              function mkListener(i) { 
+                  return function() { 
+                      console.log(i); 
+                      videos[i].volume = 1.0;
+                  };
+              };
+              for (var i = 0; i < buttons.length; i++) {
+                  buttons[i].onclick = mkListener(i);
+              }
+              window.setInterval(function() {
+                  for (var i = 0; i < videos.length; i++) {
+                      videos[i].volume = 0.98 * videos[i].volume;
+                  }
+              }, 100);
+          } catch (e) {
+              console.log(e);
+          }
+    };
+````
+
+
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; example 4
+
+You can even clip a video: For firefox:
+http://people.mozilla.org/~prouget/demos/round/index.xhtml
+
+For chromium:
+<a href="example4.html">EXAMPLE 4</a>
+
+````
+    #basicmovie {
+        position: fixed;
+    -webkit-clip-path: polygon( 10% 0%, 20% 0%, 40% 100%, 30% 100% );
+    clip-path: polygon( 10% 0%, 20% 0%, 40% 100%, 30% 100% );
+    transition: clip-path 2s;
+    -webkit-transition: -webkit-clip-path 2s;
+    }
+    #basicmovie:hover {
+    -webkit-clip-path: polygon( 50% 0%, 60% 0%, 100% 100%, 90% 100% );
+    clip-path: polygon( 50% 0%, 60% 0%, 100% 100%, 90% 100% );
+    }
+````
+
+
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; example 5
+
+You can use clip directly.
+
+<a href="example4.html">EXAMPLE 5</a>
+
+````
+    #basicmovie {
+        position: fixed;
+        clip: rect( 0px, 100px, 80px, 0px );
+        transition: clip 2s;
+    }
+    #basicmovie:hover {
+        clip: rect( 400px, 500px, 580px, 300px );
+    }
+````
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; tag and Javascript
+
+There are many relevant events to fill in
+* onpause
+* onplay
+* onerror
+* onended
+* oncanplay
+* onseeking
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; tag and Javascript
+
+Important methods and properties
+* video.play() - play 
+* video.pause() - pause
+* video.volume -- volume 0.0 to 1.0
+* video.currentTime - current playback time (or sets it!)
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## &lt;video&gt; tag and canvas
+
+Video tags are visual contexts, so you can grab their content: you can
+framegrab!
+
+Taken from Pete Lapage's 2014 guide:
+http://www.html5rocks.com/en/tutorials/video/basics/
+
+````
+// (c) 2014 Pete Lapage (Apache 2.0 License)
+function grabScreenshot() {
+  ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+  var img = new Image();
+  img.src = canvas.toDataURL("image/png");
+  img.width = 120;
+  ssContainer.appendChild(img);
+}
+````
+
+<a href="example7.html">example 7</a>
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## Resources
+
+* Video on the Web (amazing) http://diveintohtml5.info/video.html
+* HTML5 Video from HTML5Rocks
+http://www.html5rocks.com/en/tutorials/video/basics/
+* Video tag events
+http://www.w3schools.com/tags/ref_eventattributes.asp
+* MDN: Using HTML5 Audio and Video https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## LICENSE
+
+Copyright 2014 (C) Abram Hindle
+
+The textual components of this slide deck are placed under the
+Creative Commons Attribute-ShareAlike 4.0 International License (CC
+BY-SA 4.0)
+
+</script>
+</div>
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+<!-- ######################## START MARKDOWN SLIDE ########################## -->
+<section>
+<div data-markdown>
+<script type="text/template">
+## LICENSE
+
+The source code to this slide deck is:
+
+````
+Copyright (C) 2013 Hakim El Hattab, http://hakim.se
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+````
+
+</script>
+</div>
+</section>
+<!-- ######################## END MARKDOWN SLIDE ########################## -->
+
+
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: 'sky',//Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: 'linear' || Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

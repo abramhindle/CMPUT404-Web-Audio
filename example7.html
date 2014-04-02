@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Example: Background</title>
+    <meta charset="UTF-8"/>
+  </head>
+  <style>
+    #basicmovie {
+        position: fixed;
+        clip: rect( 0px, 100px, 80px, 0px );
+        transition: clip 2s;
+    }
+    #basicmovie:hover {
+        clip: rect( 400px, 500px, 580px, 300px );
+    }
+    .frame {
+        margin: 0px;
+        padding: 0px;
+        margin-top: 0px;
+    }
+    #ss {
+        padding: 0px;
+        margin: 0px;
+        font-size: 0px;
+    }
+    #ss > * {
+        margin-top: 0px;
+        padding: 0px;
+    }
+    body {
+        color: white;
+        background-color: black;
+    }
+  </style>
+  <body>
+    <video id="basicmovie" width="640" height="480" preload controls
+        autoplay loop>
+      <source src="DSCI0039.webm" type="video/webm; codecs=vp8,vorbis" />
+      <source src="DSCI0039.ogv" type="video/ogg; codecs=theora,vorbis" />
+      <source src="DSCI0039.mp4" />
+    </video>
+
+    <div id="ss"></div>
+    <script>
+window.onload = function() {
+    try {
+        var canvas = document.createElement('canvas');
+        var ssContainer = document.getElementById("ss");
+        var video = document.getElementById("basicmovie");
+        var ctx = canvas.getContext('2d');
+        var videoWidth = 640;
+        var videoHeight = 480;
+        // (c) 2014 Pete Lapage (Apache 2.0 License)
+        var grabScreenshot = function() {
+            ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+            var img = new Image();
+            img.src = canvas.toDataURL("image/png");
+            img.width = 640/10;
+            img.class = "frame";
+            img.onload = function() {
+                ssContainer.appendChild(img);
+                while (ssContainer.childNodes.length >  256) {
+                    ssContainer.removeChild(ssContainer.firstChild);
+                }
+            }
+        }
+        
+        video.oncanplay = function() {
+            window.setInterval( grabScreenshot, 1000/30.0);
+        };
+    } catch (e) {
+        console.log(e)
+    }
+};
+
+    </script>
+  </body>
+</html>
