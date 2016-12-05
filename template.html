@@ -307,7 +307,7 @@ function sustain() {
     } else {
     	// Decay
     	susgain.gain.linearRampToValueAtTime(0.4,context.currentTime);
-    	susgain.gain.linearRampToValueAtTime(0.0,context.currentTime + 1.5);
+    	susgain.gain.linearRampToValueAtTime(0.0,context.currentTime + 0.5);
     	sussine.stop(context.currentTime + 0.5);
    }
    state = !state;
