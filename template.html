@@ -283,7 +283,35 @@ function exampleFilters() {
 
 }
 
-
+// uh use an object, sheesh.
+var state = 0;
+var sussine = undefined;
+var susgain = undefined;
+function sustain() {
+    if (!state) { 
+    	sussine = context.createOscillator();
+    	susgain = context.createGain();
+    	susgain.connect(context.destination);
+    	susgain.gain.value = 0.0;
+    	sussine.type = "sine";
+    	sussine.frequency = 400;
+    	sussine.connect(susgain);
+    	susgain.gain.linearRampToValueAtTime(0.0,context.currentTime);   
+    	// A attack
+    	susgain.gain.linearRampToValueAtTime(0.9,context.currentTime + 0.01);
+    	// D decay
+    	susgain.gain.linearRampToValueAtTime(0.4,context.currentTime + 0.2);
+    	// S sustain
+    	susgain.gain.linearRampToValueAtTime(0.4,context.currentTime + 0.22);
+    	sussine.start(0);
+    } else {
+    	// Decay
+    	susgain.gain.linearRampToValueAtTime(0.4,context.currentTime);
+    	susgain.gain.linearRampToValueAtTime(0.0,context.currentTime + 1.5);
+    	sussine.stop(context.currentTime + 0.5);
+   }
+   state = !state;
+}
 
 
 function ready() {
@@ -308,6 +336,7 @@ function ready() {
         button.appendChild( new Text(text) );
         palette.appendChild( button );
         button.addEventListener('click', f);
+        return button;
     }
     addButan("example", exampleInstrument);
     addButan("oscillator", exampleOscillator)
@@ -318,6 +347,10 @@ function ready() {
     addButan("Freq Modulation", exampleFreqModulation);
     addButan("Lowpass", exampleFilters);
 
+    var b2 = addButan("Sustainted", sustain);
+    b2.addEventListener('mousedown', sustain);
+    b2.addEventListener('mouseup', sustain);
+    b2.removeEventListener('click', sustain);
     
 }
 
